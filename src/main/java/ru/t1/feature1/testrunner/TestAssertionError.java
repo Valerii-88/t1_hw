@@ -1,4 +1,4 @@
-package ru.t1.testrunner;
+package ru.t1.feature1.testrunner;
 
 public class TestAssertionError extends AssertionError {
     public TestAssertionError(String message) {
@@ -9,3 +9,4 @@ public class TestAssertionError extends AssertionError {
         super(message, cause);
     }
 }
+

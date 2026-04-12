@@ -1,4 +1,4 @@
-package ru.t1.testrunner;
+package ru.t1.feature1.testrunner;
 
 public class BadTestClassError extends Error {
     public BadTestClassError(String message) {
@@ -9,3 +9,4 @@ public class BadTestClassError extends Error {
         super(message, cause);
     }
 }
+

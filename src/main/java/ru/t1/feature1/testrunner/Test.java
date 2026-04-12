@@ -1,4 +1,4 @@
-package ru.t1.testrunner;
+package ru.t1.feature1.testrunner;
 
 public class Test {
     private final TestResult result;
@@ -23,3 +23,4 @@ public class Test {
         return throwable;
     }
 }
+

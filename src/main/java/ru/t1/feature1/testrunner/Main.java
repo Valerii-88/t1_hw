@@ -1,4 +1,4 @@
-package ru.t1.testrunner;
+package ru.t1.feature1.testrunner;
 
 import java.util.List;
 import java.util.Map;
@@ -21,3 +21,4 @@ public class Main {
         }
     }
 }
+

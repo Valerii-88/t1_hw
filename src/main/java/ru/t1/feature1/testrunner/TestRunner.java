@@ -1,11 +1,11 @@
-package ru.t1.testrunner;
+package ru.t1.feature1.testrunner;
 
-import ru.t1.testrunner.annotations.AfterEach;
-import ru.t1.testrunner.annotations.AfterSuite;
-import ru.t1.testrunner.annotations.BeforeEach;
-import ru.t1.testrunner.annotations.BeforeSuite;
-import ru.t1.testrunner.annotations.Disabled;
-import ru.t1.testrunner.annotations.Order;
+import ru.t1.feature1.testrunner.annotations.AfterEach;
+import ru.t1.feature1.testrunner.annotations.AfterSuite;
+import ru.t1.feature1.testrunner.annotations.BeforeEach;
+import ru.t1.feature1.testrunner.annotations.BeforeSuite;
+import ru.t1.feature1.testrunner.annotations.Disabled;
+import ru.t1.feature1.testrunner.annotations.Order;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -141,7 +141,7 @@ public final class TestRunner {
             if (method.isAnnotationPresent(AfterEach.class)) {
                 afterEachMethods.add(method);
             }
-            if (method.isAnnotationPresent(ru.t1.testrunner.annotations.Test.class)) {
+            if (method.isAnnotationPresent(ru.t1.feature1.testrunner.annotations.Test.class)) {
                 testCases.add(toTestCase(method));
             }
         }
@@ -158,7 +158,7 @@ public final class TestRunner {
 
     private static void validateMethod(Class<?> testClass, Method method) {
         boolean isStatic = Modifier.isStatic(method.getModifiers());
-        if (isStatic && (method.isAnnotationPresent(ru.t1.testrunner.annotations.Test.class)
+        if (isStatic && (method.isAnnotationPresent(ru.t1.feature1.testrunner.annotations.Test.class)
                 || method.isAnnotationPresent(BeforeEach.class)
                 || method.isAnnotationPresent(AfterEach.class))) {
             throw new BadTestClassError("Method must not be static: " + testClass.getName() + "#" + method.getName());
@@ -169,8 +169,8 @@ public final class TestRunner {
     }
 
     private static TestCase toTestCase(Method method) {
-        ru.t1.testrunner.annotations.Test testAnnotation =
-                method.getAnnotation(ru.t1.testrunner.annotations.Test.class);
+        ru.t1.feature1.testrunner.annotations.Test testAnnotation =
+                method.getAnnotation(ru.t1.feature1.testrunner.annotations.Test.class);
         Order orderAnnotation = method.getAnnotation(Order.class);
         int priority = validatedRange(testAnnotation.priority(), 0, 10, "@Test.priority", method);
         int order = orderAnnotation == null ? 5 : validatedRange(orderAnnotation.value(), 1, 10, "@Order", method);
@@ -230,3 +230,4 @@ public final class TestRunner {
     private record TestCase(Method method, String name, int priority, int order, boolean disabled) {
     }
 }
+

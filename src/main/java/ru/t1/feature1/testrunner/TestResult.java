@@ -1,4 +1,4 @@
-package ru.t1.testrunner;
+package ru.t1.feature1.testrunner;
 
 public enum TestResult {
     SUCCESS,
@@ -6,3 +6,4 @@ public enum TestResult {
     ERROR,
     SKIPPED
 }
+
