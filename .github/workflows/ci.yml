@@ -46,4 +46,4 @@ jobs:
         run: test -n "$SUPABASE_DB_PASSWORD"
 
       - name: Run Feature4 demo
-        run: mvn --batch-mode --errors --fail-at-end --show-version -DskipTests exec:java
+        run: mvn --batch-mode --errors --fail-at-end --show-version -DskipTests compile exec:java
