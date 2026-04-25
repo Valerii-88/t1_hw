@@ -6,6 +6,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -25,6 +26,7 @@ public class UserDao {
         try (Connection connection = dataSource.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setString(1, username);
+            logSql(sql, username);
 
             try (ResultSet resultSet = statement.executeQuery()) {
                 if (resultSet.next()) {
@@ -44,6 +46,7 @@ public class UserDao {
         try (Connection connection = dataSource.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setLong(1, id);
+            logSql(sql, id);
 
             try (ResultSet resultSet = statement.executeQuery()) {
                 if (resultSet.next()) {
@@ -61,12 +64,15 @@ public class UserDao {
         List<User> users = new ArrayList<>();
 
         try (Connection connection = dataSource.getConnection();
-             PreparedStatement statement = connection.prepareStatement(sql);
-             ResultSet resultSet = statement.executeQuery()) {
-            while (resultSet.next()) {
-                users.add(mapUser(resultSet));
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+            logSql(sql);
+
+            try (ResultSet resultSet = statement.executeQuery()) {
+                while (resultSet.next()) {
+                    users.add(mapUser(resultSet));
+                }
+                return users;
             }
-            return users;
         } catch (SQLException exception) {
             throw new IllegalStateException("Failed to find all users", exception);
         }
@@ -79,6 +85,7 @@ public class UserDao {
              PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setString(1, user.getUsername());
             statement.setLong(2, user.getId());
+            logSql(sql, user.getUsername(), user.getId());
 
             try (ResultSet resultSet = statement.executeQuery()) {
                 if (resultSet.next()) {
@@ -97,10 +104,19 @@ public class UserDao {
         try (Connection connection = dataSource.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setLong(1, id);
+            logSql(sql, id);
             return statement.executeUpdate() > 0;
         } catch (SQLException exception) {
             throw new IllegalStateException("Failed to delete user", exception);
         }
+    }
+
+    private void logSql(String sql, Object... parameters) {
+        String formattedParameters = parameters.length == 0
+                ? "[]"
+                : Arrays.toString(parameters);
+        System.out.println("SQL: " + sql);
+        System.out.println("PARAMS: " + formattedParameters);
     }
 
     private User mapUser(ResultSet resultSet) throws SQLException {
