@@ -1,4 +1,4 @@
-package ru.t1.testrunner;
+package ru.t1.feature1.testrunner;
 
 import org.junit.jupiter.api.Assertions;
 
@@ -51,49 +51,49 @@ class TestRunnerTest {
     static class OrderedScenario {
         static final List<String> EVENTS = new ArrayList<>();
 
-        @ru.t1.testrunner.annotations.BeforeSuite
+        @ru.t1.feature1.testrunner.annotations.BeforeSuite
         static void beforeSuite() {
             EVENTS.add("beforeSuite");
         }
 
-        @ru.t1.testrunner.annotations.BeforeEach
+        @ru.t1.feature1.testrunner.annotations.BeforeEach
         void beforeEach() {
             EVENTS.add("beforeEach");
         }
 
-        @ru.t1.testrunner.annotations.AfterEach
+        @ru.t1.feature1.testrunner.annotations.AfterEach
         void afterEach() {
             EVENTS.add("afterEach");
         }
 
-        @ru.t1.testrunner.annotations.Test("beta")
-        @ru.t1.testrunner.annotations.Order(2)
+        @ru.t1.feature1.testrunner.annotations.Test("beta")
+        @ru.t1.feature1.testrunner.annotations.Order(2)
         void beta() {
             EVENTS.add("beta");
             throw new TestAssertionError("failed");
         }
 
-        @ru.t1.testrunner.annotations.Test("alpha")
-        @ru.t1.testrunner.annotations.Order(1)
+        @ru.t1.feature1.testrunner.annotations.Test("alpha")
+        @ru.t1.feature1.testrunner.annotations.Order(1)
         void alpha() {
             EVENTS.add("alpha");
         }
 
-        @ru.t1.testrunner.annotations.Test("gamma")
-        @ru.t1.testrunner.annotations.Order(3)
+        @ru.t1.feature1.testrunner.annotations.Test("gamma")
+        @ru.t1.feature1.testrunner.annotations.Order(3)
         void gamma() {
             throw new IllegalStateException("boom");
         }
 
-        @ru.t1.testrunner.annotations.Test("disabled")
-        @ru.t1.testrunner.annotations.Disabled
+        @ru.t1.feature1.testrunner.annotations.Test("disabled")
+        @ru.t1.feature1.testrunner.annotations.Disabled
         void disabled() {
             EVENTS.add("disabled");
         }
     }
 
     static class InvalidStaticTest {
-        @ru.t1.testrunner.annotations.Test
+        @ru.t1.feature1.testrunner.annotations.Test
         static void broken() {
         }
     }
@@ -105,9 +105,10 @@ class TestRunnerTest {
             this.value = value;
         }
 
-        @ru.t1.testrunner.annotations.Test
+        @ru.t1.feature1.testrunner.annotations.Test
         void test() {
             Assertions.assertNotNull(value);
         }
     }
 }
+
