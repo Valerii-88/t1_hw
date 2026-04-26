@@ -72,9 +72,18 @@ Root:
 `product-service`:
 
 - `pom.xml`
+- `src/main/java/.../feature1/...`
+- `src/main/java/.../feature2/...`
+- `src/main/java/.../feature3/...`
+- `src/main/java/.../feature4/...`
+- `src/main/java/.../feature5/...`
 - `src/main/java/.../feature6/...`
 - `src/main/resources/application.yml`
+- `src/main/resources/feature4.properties`
 - `src/main/resources/db/migration/...`
+- `src/test/java/.../feature1/...`
+- `src/test/java/.../feature2/...`
+- `src/test/java/.../feature3/...`
 - `src/test/java/.../feature6/...`
 
 `payment-service`:
@@ -86,6 +95,8 @@ Root:
 - `src/test/java/.../feature7/...`
 
 No shared Java module is added because that would likely overcomplicate a training task and trigger review comments about unnecessary abstractions.
+
+For minimal churn, existing feature1-feature5 code and their tests stay in `product-service` during the module extraction. This keeps the current test suite intact and avoids unrelated refactoring.
 
 ## Product-Service Changes
 
@@ -101,17 +112,14 @@ No shared Java module is added because that would likely overcomplicate a traini
 Request body:
 
 - `amount`
-- `paymentId`
 
 Response body:
 
-- `productId`
+- `id`
 - `accountNumber`
 - `balance`
 - `productType`
 - `userId`
-- `debitedAmount`
-- `paymentId`
 
 ### Debit Rules
 
@@ -167,9 +175,7 @@ Response body:
 - `productId`
 - `amount`
 - `description`
-- `status`
 - `createdAt`
-- `productBalanceAfterDebit`
 
 Only successful payments are stored and returned.
 
@@ -178,7 +184,7 @@ Only successful payments are stored and returned.
 1. Validate request fields in payment-service.
 2. Request the product by `productId` from product-service.
 3. Verify that the product belongs to `userId`.
-4. Call product-service debit endpoint with `amount` and an internal payment correlation value.
+4. Call product-service debit endpoint with `amount`.
 5. If debit succeeds, persist the payment entity in payment-service.
 6. Return the successful payment response.
 
@@ -193,15 +199,11 @@ Table: `payments`
 - `product_id bigint not null`
 - `amount numeric(19,2) not null`
 - `description varchar(255) not null`
-- `status varchar(32) not null`
 - `created_at timestamp not null`
 
 Constraints:
 
 - `amount > 0`
-- `status` check limited to `SUCCESS`
-
-Although only successful payments are stored, keeping the `status` column is acceptable and future-safe without adding complexity.
 
 ## Payment-Service Components
 
@@ -242,6 +244,7 @@ All settings must live in `application.yml`.
 - datasource
 - JPA
 - Flyway
+- dedicated Flyway history table
 - server port
 
 `payment-service`:
@@ -249,6 +252,7 @@ All settings must live in `application.yml`.
 - datasource
 - JPA
 - Flyway
+- dedicated Flyway history table
 - server port
 - product-service base URL
 - RestTemplate timeouts
