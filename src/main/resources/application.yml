@@ -1,6 +1,4 @@
 spring:
-  main:
-    web-application-type: none
   datasource:
     url: ${SUPABASE_DB_URL:jdbc:postgresql://aws-0-eu-west-1.pooler.supabase.com:6543/postgres?sslmode=require}
     username: ${SUPABASE_DB_USERNAME:feature4_app.qdcvoukgdmgntpmathjr}
