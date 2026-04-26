@@ -10,9 +10,11 @@ import ru.t1.feature6.users.UserRepository;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -72,5 +74,34 @@ class ProductServiceTest {
         );
 
         assertEquals("Product with id=999 was not found", exception.getMessage());
+    }
+
+    @Test
+    void debitsProductBalanceWhenEnoughFundsExist() {
+        User user = new User(7L, "test_user_1");
+        Product product = new Product(101L, "40817810000000000001", new BigDecimal("15320.45"), ProductType.ACCOUNT, user);
+
+        when(productRepository.findById(101L)).thenReturn(Optional.of(product));
+        when(productRepository.save(product)).thenReturn(product);
+
+        Product debited = productService.debit(101L, new BigDecimal("320.45"));
+
+        assertEquals(new BigDecimal("15000.00"), debited.getBalance());
+        verify(productRepository).save(product);
+    }
+
+    @Test
+    void throwsWhenBalanceIsInsufficient() {
+        User user = new User(7L, "test_user_1");
+        Product product = new Product(101L, "40817810000000000001", new BigDecimal("100.00"), ProductType.ACCOUNT, user);
+
+        when(productRepository.findById(101L)).thenReturn(Optional.of(product));
+
+        InsufficientFundsException exception = assertThrows(
+                InsufficientFundsException.class,
+                () -> productService.debit(101L, new BigDecimal("150.00"))
+        );
+
+        assertEquals("Product with id=101 has insufficient funds", exception.getMessage());
     }
 }
