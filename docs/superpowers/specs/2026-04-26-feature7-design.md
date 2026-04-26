@@ -98,6 +98,8 @@ No shared Java module is added because that would likely overcomplicate a traini
 
 For minimal churn, existing feature1-feature5 code and their tests stay in `product-service` during the module extraction. This keeps the current test suite intact and avoids unrelated refactoring.
 
+During the initial module extraction, `payment-service` should be introduced as a minimal runnable Spring Boot scaffold first. Its web/database/runtime stack should be added only when the real payment functionality starts, to avoid premature auto-configuration failures and unnecessary build coupling.
+
 ## Product-Service Changes
 
 ### Existing Endpoints Kept
