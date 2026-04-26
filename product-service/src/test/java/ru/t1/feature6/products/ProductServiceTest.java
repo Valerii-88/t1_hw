@@ -14,6 +14,7 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -103,5 +104,16 @@ class ProductServiceTest {
         );
 
         assertEquals("Product with id=101 has insufficient funds", exception.getMessage());
+    }
+
+    @Test
+    void throwsWhenDebitAmountIsNotPositive() {
+        IllegalArgumentException exception = assertThrows(
+                IllegalArgumentException.class,
+                () -> productService.debit(101L, BigDecimal.ZERO)
+        );
+
+        assertEquals("Amount must be positive", exception.getMessage());
+        verify(productRepository, never()).findById(101L);
     }
 }

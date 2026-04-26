@@ -93,4 +93,18 @@ class ProductControllerTest {
                 .andExpect(status().isUnprocessableEntity())
                 .andExpect(jsonPath("$.error").value("Product with id=101 has insufficient funds"));
     }
+
+    @Test
+    void returnsBadRequestForNonPositiveDebitAmount() throws Exception {
+        when(productService.debit(101L, BigDecimal.ZERO))
+                .thenThrow(new IllegalArgumentException("Amount must be positive"));
+
+        mockMvc.perform(post("/api/v1/products/101/debit")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"amount":0}
+                                """))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.error").value("Amount must be positive"));
+    }
 }
