@@ -80,23 +80,21 @@ class ProductServiceTest {
     @Test
     void debitsProductBalanceWhenEnoughFundsExist() {
         User user = new User(7L, "test_user_1");
-        Product product = new Product(101L, "40817810000000000001", new BigDecimal("15320.45"), ProductType.ACCOUNT, user);
+        Product product = new Product(101L, "40817810000000000001", new BigDecimal("15000.00"), ProductType.ACCOUNT, user);
 
+        when(productRepository.debitBalanceIfEnoughFunds(101L, new BigDecimal("320.45"))).thenReturn(1);
         when(productRepository.findById(101L)).thenReturn(Optional.of(product));
-        when(productRepository.save(product)).thenReturn(product);
 
         Product debited = productService.debit(101L, new BigDecimal("320.45"));
 
         assertEquals(new BigDecimal("15000.00"), debited.getBalance());
-        verify(productRepository).save(product);
+        verify(productRepository).debitBalanceIfEnoughFunds(101L, new BigDecimal("320.45"));
     }
 
     @Test
     void throwsWhenBalanceIsInsufficient() {
-        User user = new User(7L, "test_user_1");
-        Product product = new Product(101L, "40817810000000000001", new BigDecimal("100.00"), ProductType.ACCOUNT, user);
-
-        when(productRepository.findById(101L)).thenReturn(Optional.of(product));
+        when(productRepository.debitBalanceIfEnoughFunds(101L, new BigDecimal("150.00"))).thenReturn(0);
+        when(productRepository.existsById(101L)).thenReturn(true);
 
         InsufficientFundsException exception = assertThrows(
                 InsufficientFundsException.class,
@@ -107,6 +105,19 @@ class ProductServiceTest {
     }
 
     @Test
+    void throwsWhenProductIsMissingDuringDebit() {
+        when(productRepository.debitBalanceIfEnoughFunds(999L, new BigDecimal("150.00"))).thenReturn(0);
+        when(productRepository.existsById(999L)).thenReturn(false);
+
+        ResourceNotFoundException exception = assertThrows(
+                ResourceNotFoundException.class,
+                () -> productService.debit(999L, new BigDecimal("150.00"))
+        );
+
+        assertEquals("Product with id=999 was not found", exception.getMessage());
+    }
+
+    @Test
     void throwsWhenDebitAmountIsNotPositive() {
         IllegalArgumentException exception = assertThrows(
                 IllegalArgumentException.class,
@@ -114,6 +125,17 @@ class ProductServiceTest {
         );
 
         assertEquals("Amount must be positive", exception.getMessage());
-        verify(productRepository, never()).findById(101L);
+        verify(productRepository, never()).debitBalanceIfEnoughFunds(101L, BigDecimal.ZERO);
+    }
+
+    @Test
+    void throwsWhenDebitAmountHasMoreThanTwoDecimalPlaces() {
+        IllegalArgumentException exception = assertThrows(
+                IllegalArgumentException.class,
+                () -> productService.debit(101L, new BigDecimal("0.001"))
+        );
+
+        assertEquals("Amount must have at most 2 decimal places", exception.getMessage());
+        verify(productRepository, never()).debitBalanceIfEnoughFunds(101L, new BigDecimal("0.001"));
     }
 }

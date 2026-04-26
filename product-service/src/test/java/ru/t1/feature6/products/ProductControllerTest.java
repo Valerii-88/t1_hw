@@ -107,4 +107,18 @@ class ProductControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.error").value("Amount must be positive"));
     }
+
+    @Test
+    void returnsBadRequestForOverPrecisionDebitAmount() throws Exception {
+        when(productService.debit(101L, new BigDecimal("0.001")))
+                .thenThrow(new IllegalArgumentException("Amount must have at most 2 decimal places"));
+
+        mockMvc.perform(post("/api/v1/products/101/debit")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"amount":0.001}
+                                """))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.error").value("Amount must have at most 2 decimal places"));
+    }
 }

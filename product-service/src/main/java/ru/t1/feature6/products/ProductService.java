@@ -37,13 +37,16 @@ public class ProductService {
         validateId(productId, "Product");
         validateAmount(amount);
 
-        Product product = getByProductId(productId);
-        if (product.getBalance().compareTo(amount) < 0) {
+        int updatedRows = productRepository.debitBalanceIfEnoughFunds(productId, amount);
+        if (updatedRows == 1) {
+            return getByProductId(productId);
+        }
+
+        if (productRepository.existsById(productId)) {
             throw new InsufficientFundsException("Product with id=" + productId + " has insufficient funds");
         }
 
-        product.setBalance(product.getBalance().subtract(amount));
-        return productRepository.save(product);
+        throw new ResourceNotFoundException("Product with id=" + productId + " was not found");
     }
 
     private void validateId(Long id, String label) {
@@ -55,6 +58,9 @@ public class ProductService {
     private void validateAmount(BigDecimal amount) {
         if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
             throw new IllegalArgumentException("Amount must be positive");
+        }
+        if (amount.scale() > 2) {
+            throw new IllegalArgumentException("Amount must have at most 2 decimal places");
         }
     }
 }
