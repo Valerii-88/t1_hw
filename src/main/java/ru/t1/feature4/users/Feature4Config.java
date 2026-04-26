@@ -19,6 +19,7 @@ public class Feature4Config {
         config.setPassword(readRequiredSetting("supabase.db.password", "SUPABASE_DB_PASSWORD"));
         config.setMaximumPoolSize(5);
         config.setPoolName("feature4-users-pool");
+        config.addDataSourceProperty("prepareThreshold", "0");
         return new HikariDataSource(config);
     }
 

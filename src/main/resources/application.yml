@@ -1,0 +1,28 @@
+spring:
+  main:
+    web-application-type: none
+  datasource:
+    url: ${SUPABASE_DB_URL:jdbc:postgresql://aws-0-eu-west-1.pooler.supabase.com:6543/postgres?sslmode=require}
+    username: ${SUPABASE_DB_USERNAME:feature4_app.qdcvoukgdmgntpmathjr}
+    password: ${SUPABASE_DB_PASSWORD}
+    hikari:
+      data-source-properties:
+        prepareThreshold: 0
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        default_schema: public
+        format_sql: true
+  flyway:
+    enabled: true
+    schemas: public
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+    baseline-version: 0
+
+logging:
+  level:
+    org.hibernate.SQL: DEBUG
+    org.hibernate.orm.jdbc.bind: TRACE

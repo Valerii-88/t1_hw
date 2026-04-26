@@ -4,6 +4,13 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>3.3.5</version>
+        <relativePath/>
+    </parent>
+
     <groupId>ru.t1</groupId>
     <artifactId>t1-hw</artifactId>
     <version>1.0-SNAPSHOT</version>
@@ -13,31 +20,26 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <junit.version>5.12.0</junit.version>
         <postgresql.version>42.7.4</postgresql.version>
-        <hikaricp.version>5.1.0</hikaricp.version>
-        <spring.version>6.1.14</spring.version>
-        <slf4j.version>1.7.36</slf4j.version>
+        <exec.mainClass>ru.t1.feature5.users.Feature5Application</exec.mainClass>
     </properties>
 
     <dependencies>
         <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-database-postgresql</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
             <version>${postgresql.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.zaxxer</groupId>
-            <artifactId>HikariCP</artifactId>
-            <version>${hikaricp.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-context</artifactId>
-            <version>${spring.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-simple</artifactId>
-            <version>${slf4j.version}</version>
         </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
@@ -52,14 +54,17 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>3.5.2</version>
+            </plugin>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
             </plugin>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>
                 <version>3.5.0</version>
                 <configuration>
-                    <mainClass>ru.t1.feature4.users.Feature4Demo</mainClass>
+                    <mainClass>${exec.mainClass}</mainClass>
                 </configuration>
             </plugin>
         </plugins>
