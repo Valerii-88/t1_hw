@@ -2,55 +2,30 @@ package ru.t1.feature4.users;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
 
 @Configuration
+@PropertySource("classpath:feature4.properties")
 public class Feature4Config {
-    private static final String DEFAULT_DB_URL =
-            "jdbc:postgresql://aws-0-eu-west-1.pooler.supabase.com:6543/postgres?sslmode=require";
-    private static final String DEFAULT_DB_USERNAME = "feature4_app.qdcvoukgdmgntpmathjr";
-
     @Bean(destroyMethod = "close")
-    public HikariDataSource dataSource() {
+    public HikariDataSource dataSource(Environment environment) {
         HikariConfig config = new HikariConfig();
-        config.setJdbcUrl(readSetting("supabase.db.url", "SUPABASE_DB_URL", DEFAULT_DB_URL));
-        config.setUsername(readSetting("supabase.db.username", "SUPABASE_DB_USERNAME", DEFAULT_DB_USERNAME));
-        config.setPassword(readRequiredSetting("supabase.db.password", "SUPABASE_DB_PASSWORD"));
-        config.setMaximumPoolSize(5);
-        config.setPoolName("feature4-users-pool");
-        config.addDataSourceProperty("prepareThreshold", "0");
+        config.setJdbcUrl(getRequiredProperty(environment, "feature4.datasource.url"));
+        config.setUsername(getRequiredProperty(environment, "feature4.datasource.username"));
+        config.setPassword(getRequiredProperty(environment, "feature4.datasource.password"));
+        config.setMaximumPoolSize(Integer.parseInt(getRequiredProperty(environment, "feature4.datasource.maximum-pool-size")));
+        config.setPoolName(getRequiredProperty(environment, "feature4.datasource.pool-name"));
+        config.addDataSourceProperty("prepareThreshold", getRequiredProperty(environment, "feature4.datasource.prepare-threshold"));
         return new HikariDataSource(config);
     }
 
-    @Bean
-    public UserDao userDao(HikariDataSource dataSource) {
-        return new UserDao(dataSource);
-    }
-
-    @Bean
-    public UserService userService(UserDao userDao) {
-        return new UserService(userDao);
-    }
-
-    private String readSetting(String propertyName, String environmentName, String defaultValue) {
-        String value = System.getProperty(propertyName);
+    private String getRequiredProperty(Environment environment, String propertyName) {
+        String value = environment.resolvePlaceholders(environment.getProperty(propertyName, ""));
         if (value == null || value.isBlank()) {
-            value = System.getenv(environmentName);
-        }
-        if (value == null || value.isBlank()) {
-            return defaultValue;
-        }
-        return value;
-    }
-
-    private String readRequiredSetting(String propertyName, String environmentName) {
-        String value = readSetting(propertyName, environmentName, null);
-        if (value == null || value.isBlank()) {
-            throw new IllegalStateException(
-                    "Missing database setting. Set JVM property '" + propertyName
-                            + "' or environment variable '" + environmentName + "'."
-            );
+            throw new IllegalStateException("Missing required setting '" + propertyName + "'");
         }
         return value;
     }

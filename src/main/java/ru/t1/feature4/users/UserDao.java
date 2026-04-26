@@ -1,5 +1,7 @@
 package ru.t1.feature4.users;
 
+import org.springframework.stereotype.Repository;
+
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -11,6 +13,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
+@Repository
 public class UserDao {
     private static final String TABLE_NAME = "public.users";
 
