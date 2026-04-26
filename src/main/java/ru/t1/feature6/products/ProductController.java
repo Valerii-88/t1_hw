@@ -8,23 +8,23 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/v1")
 public class ProductController {
     private final ProductService productService;
+    private final ProductMapper productMapper;
 
-    public ProductController(ProductService productService) {
+    public ProductController(ProductService productService, ProductMapper productMapper) {
         this.productService = productService;
+        this.productMapper = productMapper;
     }
 
     @GetMapping("/users/{userId}/products")
     public List<ProductResponse> getProductsByUserId(@PathVariable Long userId) {
-        return productService.getAllByUserId(userId).stream()
-                .map(ProductResponse::from)
-                .toList();
+        return productMapper.toResponses(productService.getAllByUserId(userId));
     }
 
     @GetMapping("/products/{productId}")
     public ProductResponse getProductByProductId(@PathVariable Long productId) {
-        return ProductResponse.from(productService.getByProductId(productId));
+        return productMapper.toResponse(productService.getByProductId(productId));
     }
 }

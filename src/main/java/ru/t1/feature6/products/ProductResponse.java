@@ -9,13 +9,4 @@ public record ProductResponse(
         ProductType productType,
         Long userId
 ) {
-    public static ProductResponse from(Product product) {
-        return new ProductResponse(
-                product.getId(),
-                product.getAccountNumber(),
-                product.getBalance(),
-                product.getProductType(),
-                product.getUser().getId()
-        );
-    }
 }
