@@ -2,12 +2,14 @@ package ru.t1.feature4.users;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 
 @Configuration
+@ComponentScan(basePackageClasses = Feature4Config.class)
 @PropertySource("classpath:feature4.properties")
 public class Feature4Config {
     @Bean(destroyMethod = "close")

@@ -9,9 +9,7 @@ public final class Feature4Demo {
     }
 
     public static void main(String[] args) {
-        try (AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext()) {
-            context.scan("ru.t1.feature4.users");
-            context.refresh();
+        try (AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(Feature4Config.class)) {
             UserService userService = context.getBean(UserService.class);
             String username = "feature4_user_" + System.currentTimeMillis();
 
