@@ -2,13 +2,13 @@ server:
   port: ${PRODUCT_SERVICE_PORT:8081}
 
 spring:
+  application:
+    name: product-service
   datasource:
-    url: ${SUPABASE_DB_URL:jdbc:postgresql://aws-0-eu-west-1.pooler.supabase.com:6543/postgres?sslmode=require}
-    username: ${SUPABASE_DB_USERNAME:feature4_app.qdcvoukgdmgntpmathjr}
-    password: ${SUPABASE_DB_PASSWORD}
-    hikari:
-      data-source-properties:
-        prepareThreshold: 0
+    url: jdbc:h2:mem:product-service;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE;DEFAULT_NULL_ORDERING=HIGH;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE;INIT=CREATE SCHEMA IF NOT EXISTS public\;SET SCHEMA public
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
   jpa:
     hibernate:
       ddl-auto: validate
@@ -19,7 +19,7 @@ spring:
   flyway:
     enabled: true
     schemas: public
-    locations: classpath:db/migration
+    locations: classpath:db/migration-h2
     baseline-on-migrate: true
     baseline-version: 0
     table: flyway_product_service_history

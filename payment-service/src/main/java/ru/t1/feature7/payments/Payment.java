@@ -6,6 +6,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import org.hibernate.Hibernate;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -105,23 +106,19 @@ public class Payment {
     }
 
     @Override
-    public boolean equals(Object object) {
+    public final boolean equals(Object object) {
         if (this == object) {
             return true;
         }
-        if (!(object instanceof Payment payment)) {
+        if (object == null || Hibernate.getClass(this) != Hibernate.getClass(object)) {
             return false;
         }
-        return Objects.equals(id, payment.id)
-                && Objects.equals(userId, payment.userId)
-                && Objects.equals(productId, payment.productId)
-                && Objects.equals(amount, payment.amount)
-                && Objects.equals(description, payment.description)
-                && Objects.equals(createdAt, payment.createdAt);
+        Payment payment = (Payment) object;
+        return id != null && Objects.equals(id, payment.id);
     }
 
     @Override
-    public int hashCode() {
-        return Objects.hash(id, userId, productId, amount, description, createdAt);
+    public final int hashCode() {
+        return Hibernate.getClass(this).hashCode();
     }
 }
