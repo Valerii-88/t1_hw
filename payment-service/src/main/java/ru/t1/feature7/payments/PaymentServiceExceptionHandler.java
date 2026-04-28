@@ -3,6 +3,7 @@ package ru.t1.feature7.payments;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.util.Map;
@@ -22,6 +23,18 @@ public class PaymentServiceExceptionHandler {
             DownstreamProductServiceUnavailableException exception
     ) {
         return ResponseEntity.status(HttpStatus.BAD_GATEWAY)
+                .body(Map.of("error", exception.getMessage()));
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public Map<String, String> handleBadRequest(IllegalArgumentException exception) {
+        return Map.of("error", exception.getMessage());
+    }
+
+    @ExceptionHandler(ProductOwnershipException.class)
+    public ResponseEntity<Map<String, String>> handleProductOwnershipException(ProductOwnershipException exception) {
+        return ResponseEntity.status(HttpStatus.CONFLICT)
                 .body(Map.of("error", exception.getMessage()));
     }
 }
