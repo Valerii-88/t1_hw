@@ -1,4 +1,4 @@
-package ru.t1.feature7.payments;
+package ru.t1.feature7.payments.error;
 
 import org.springframework.http.HttpStatus;
 

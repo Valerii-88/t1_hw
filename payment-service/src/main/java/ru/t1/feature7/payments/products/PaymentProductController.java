@@ -11,15 +11,13 @@ import java.util.List;
 @RequestMapping("/api/v1")
 public class PaymentProductController {
     private final PaymentProductService paymentProductService;
-    private final PaymentProductMapper paymentProductMapper;
 
-    public PaymentProductController(PaymentProductService paymentProductService, PaymentProductMapper paymentProductMapper) {
+    public PaymentProductController(PaymentProductService paymentProductService) {
         this.paymentProductService = paymentProductService;
-        this.paymentProductMapper = paymentProductMapper;
     }
 
     @GetMapping("/users/{userId}/products")
     public List<PaymentProductResponse> getProductsByUserId(@PathVariable Long userId) {
-        return paymentProductMapper.toResponses(paymentProductService.getProductsByUserId(userId));
+        return paymentProductService.getProductsByUserId(userId);
     }
 }

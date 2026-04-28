@@ -10,9 +10,10 @@ import ru.t1.feature7.payments.api.PaymentRequest;
 import ru.t1.feature7.payments.api.PaymentResponse;
 import ru.t1.feature7.payments.client.ProductClient;
 import ru.t1.feature7.payments.client.ProductClientProductResponse;
+import ru.t1.feature7.payments.error.DownstreamProductServiceException;
+import ru.t1.feature7.payments.error.ProductOwnershipException;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;

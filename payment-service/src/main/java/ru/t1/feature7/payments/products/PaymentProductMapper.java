@@ -7,8 +7,8 @@ import java.util.List;
 
 @Component
 public class PaymentProductMapper {
-    public PaymentProduct toProduct(ProductClientProductResponse response) {
-        return new PaymentProduct(
+    public PaymentProductResponse toResponse(ProductClientProductResponse response) {
+        return new PaymentProductResponse(
                 response.id(),
                 response.accountNumber(),
                 response.balance(),
@@ -17,24 +17,8 @@ public class PaymentProductMapper {
         );
     }
 
-    public List<PaymentProduct> toProducts(List<ProductClientProductResponse> responses) {
+    public List<PaymentProductResponse> toResponses(List<ProductClientProductResponse> responses) {
         return responses.stream()
-                .map(this::toProduct)
-                .toList();
-    }
-
-    public PaymentProductResponse toResponse(PaymentProduct product) {
-        return new PaymentProductResponse(
-                product.id(),
-                product.accountNumber(),
-                product.balance(),
-                product.productType(),
-                product.userId()
-        );
-    }
-
-    public List<PaymentProductResponse> toResponses(List<PaymentProduct> products) {
-        return products.stream()
                 .map(this::toResponse)
                 .toList();
     }

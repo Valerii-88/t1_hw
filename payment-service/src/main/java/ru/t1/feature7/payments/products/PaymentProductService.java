@@ -15,11 +15,11 @@ public class PaymentProductService {
         this.paymentProductMapper = paymentProductMapper;
     }
 
-    public List<PaymentProduct> getProductsByUserId(Long userId) {
-        return paymentProductMapper.toProducts(productClient.getProductsByUserId(userId));
+    public List<PaymentProductResponse> getProductsByUserId(Long userId) {
+        return paymentProductMapper.toResponses(productClient.getProductsByUserId(userId));
     }
 
-    public PaymentProduct getProductById(Long productId) {
-        return paymentProductMapper.toProduct(productClient.getProductById(productId));
+    public PaymentProductResponse getProductById(Long productId) {
+        return paymentProductMapper.toResponse(productClient.getProductById(productId));
     }
 }

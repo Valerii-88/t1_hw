@@ -11,8 +11,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
-import ru.t1.feature7.payments.DownstreamProductServiceException;
-import ru.t1.feature7.payments.DownstreamProductServiceUnavailableException;
+import ru.t1.feature7.payments.error.DownstreamProductServiceException;
+import ru.t1.feature7.payments.error.DownstreamProductServiceUnavailableException;
 
 import java.math.BigDecimal;
 import java.util.List;

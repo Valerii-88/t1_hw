@@ -11,6 +11,10 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import ru.t1.feature7.payments.api.PaymentRequest;
 import ru.t1.feature7.payments.api.PaymentResponse;
+import ru.t1.feature7.payments.error.DownstreamProductServiceException;
+import ru.t1.feature7.payments.error.DownstreamProductServiceUnavailableException;
+import ru.t1.feature7.payments.error.PaymentServiceExceptionHandler;
+import ru.t1.feature7.payments.error.ProductOwnershipException;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;

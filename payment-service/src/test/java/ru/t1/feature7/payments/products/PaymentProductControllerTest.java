@@ -8,9 +8,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import ru.t1.feature7.payments.DownstreamProductServiceException;
-import ru.t1.feature7.payments.DownstreamProductServiceUnavailableException;
-import ru.t1.feature7.payments.PaymentServiceExceptionHandler;
+import ru.t1.feature7.payments.error.DownstreamProductServiceException;
+import ru.t1.feature7.payments.error.DownstreamProductServiceUnavailableException;
+import ru.t1.feature7.payments.error.PaymentServiceExceptionHandler;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -29,7 +29,7 @@ class PaymentProductControllerTest {
 
     @BeforeEach
     void setUp() {
-        PaymentProductController controller = new PaymentProductController(paymentProductService, new PaymentProductMapper());
+        PaymentProductController controller = new PaymentProductController(paymentProductService);
         mockMvc = MockMvcBuilders.standaloneSetup(controller)
                 .setControllerAdvice(new PaymentServiceExceptionHandler())
                 .build();
@@ -37,14 +37,14 @@ class PaymentProductControllerTest {
 
     @Test
     void returnsProductsByUserId() throws Exception {
-        PaymentProduct firstProduct = new PaymentProduct(
+        PaymentProductResponse firstProduct = new PaymentProductResponse(
                 101L,
                 "40817810000000000001",
                 new BigDecimal("15320.45"),
                 "ACCOUNT",
                 7L
         );
-        PaymentProduct secondProduct = new PaymentProduct(
+        PaymentProductResponse secondProduct = new PaymentProductResponse(
                 102L,
                 "40817810000000000002",
                 new BigDecimal("810.00"),
