@@ -5,8 +5,12 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.HttpStatus;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import ru.t1.feature7.payments.DownstreamProductServiceException;
+import ru.t1.feature7.payments.DownstreamProductServiceUnavailableException;
+import ru.t1.feature7.payments.PaymentServiceExceptionHandler;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -26,7 +30,9 @@ class PaymentProductControllerTest {
     @BeforeEach
     void setUp() {
         PaymentProductController controller = new PaymentProductController(paymentProductService, new PaymentProductMapper());
-        mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
+        mockMvc = MockMvcBuilders.standaloneSetup(controller)
+                .setControllerAdvice(new PaymentServiceExceptionHandler())
+                .build();
     }
 
     @Test
@@ -57,5 +63,35 @@ class PaymentProductControllerTest {
                 .andExpect(jsonPath("$[0].userId").value(7))
                 .andExpect(jsonPath("$[1].id").value(102))
                 .andExpect(jsonPath("$[1].productType").value("CARD"));
+    }
+
+    @Test
+    void returnsNotFoundForDownstreamNotFound() throws Exception {
+        when(paymentProductService.getProductsByUserId(7L))
+                .thenThrow(new DownstreamProductServiceException(HttpStatus.NOT_FOUND, "User with id=7 was not found"));
+
+        mockMvc.perform(get("/api/v1/users/7/products"))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.error").value("User with id=7 was not found"));
+    }
+
+    @Test
+    void returnsBadRequestForDownstreamClientError() throws Exception {
+        when(paymentProductService.getProductsByUserId(0L))
+                .thenThrow(new DownstreamProductServiceException(HttpStatus.BAD_REQUEST, "User id must be positive"));
+
+        mockMvc.perform(get("/api/v1/users/0/products"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.error").value("User id must be positive"));
+    }
+
+    @Test
+    void returnsBadGatewayForDownstreamUnavailable() throws Exception {
+        when(paymentProductService.getProductsByUserId(7L))
+                .thenThrow(new DownstreamProductServiceUnavailableException("Product service is unavailable"));
+
+        mockMvc.perform(get("/api/v1/users/7/products"))
+                .andExpect(status().isBadGateway())
+                .andExpect(jsonPath("$.error").value("Product service is unavailable"));
     }
 }
