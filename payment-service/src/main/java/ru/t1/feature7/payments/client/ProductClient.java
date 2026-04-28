@@ -83,8 +83,11 @@ public class ProductClient {
             return new DownstreamProductServiceUnavailableException("Product service is unavailable");
         }
 
-        HttpStatus normalizedStatus = statusCode == HttpStatus.NOT_FOUND ? HttpStatus.NOT_FOUND : HttpStatus.BAD_REQUEST;
-        return new DownstreamProductServiceException(normalizedStatus, extractErrorMessage(exception));
+        if (statusCode instanceof HttpStatus httpStatus && httpStatus.is4xxClientError()) {
+            return new DownstreamProductServiceException(httpStatus, extractErrorMessage(exception));
+        }
+
+        return new DownstreamProductServiceException(HttpStatus.BAD_REQUEST, extractErrorMessage(exception));
     }
 
     private String extractErrorMessage(RestClientResponseException exception) {

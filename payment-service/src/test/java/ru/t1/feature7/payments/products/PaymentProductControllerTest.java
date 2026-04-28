@@ -86,6 +86,19 @@ class PaymentProductControllerTest {
     }
 
     @Test
+    void returnsUnprocessableEntityForDownstreamBusinessError() throws Exception {
+        when(paymentProductService.getProductsByUserId(7L))
+                .thenThrow(new DownstreamProductServiceException(
+                        HttpStatus.UNPROCESSABLE_ENTITY,
+                        "Product with id=101 has insufficient funds"
+                ));
+
+        mockMvc.perform(get("/api/v1/users/7/products"))
+                .andExpect(status().isUnprocessableEntity())
+                .andExpect(jsonPath("$.error").value("Product with id=101 has insufficient funds"));
+    }
+
+    @Test
     void returnsBadGatewayForDownstreamUnavailable() throws Exception {
         when(paymentProductService.getProductsByUserId(7L))
                 .thenThrow(new DownstreamProductServiceUnavailableException("Product service is unavailable"));
