@@ -72,26 +72,3 @@ jobs:
       - name: Run Feature5 demo
         run: mvn --batch-mode --errors --fail-at-end --show-version -DskipTests compile "-Dexec.mainClass=ru.t1.feature5.users.Feature5Application" exec:java
 
-  feature6-demo:
-    if: github.event_name == 'workflow_dispatch'
-    needs: test
-    runs-on: ubuntu-latest
-    environment: feature4-demo
-    env:
-      SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Set up Java 17
-        uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: "17"
-          cache: maven
-
-      - name: Ensure database password is configured
-        run: test -n "$SUPABASE_DB_PASSWORD"
-
-      - name: Run Feature6 demo
-        run: mvn --batch-mode --errors --fail-at-end --show-version -DskipTests compile "-Dexec.mainClass=ru.t1.feature6.Feature6Demo" exec:java

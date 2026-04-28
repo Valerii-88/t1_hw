@@ -26,7 +26,7 @@ class ProductControllerTest {
 
     @BeforeEach
     void setUp() {
-        ProductController controller = new ProductController(productService);
+        ProductController controller = new ProductController(productService, new ProductMapper());
         mockMvc = MockMvcBuilders.standaloneSetup(controller)
                 .setControllerAdvice(new Feature6ExceptionHandler())
                 .build();
@@ -40,7 +40,7 @@ class ProductControllerTest {
 
         when(productService.getAllByUserId(7L)).thenReturn(List.of(firstProduct, secondProduct));
 
-        mockMvc.perform(get("/api/users/7/products"))
+        mockMvc.perform(get("/api/v1/users/7/products"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].id").value(101))
                 .andExpect(jsonPath("$[0].accountNumber").value("40817810000000000001"))
@@ -53,7 +53,7 @@ class ProductControllerTest {
     void returnsNotFoundForMissingProduct() throws Exception {
         when(productService.getByProductId(999L)).thenThrow(new ResourceNotFoundException("Product with id=999 was not found"));
 
-        mockMvc.perform(get("/api/products/999"))
+        mockMvc.perform(get("/api/v1/products/999"))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.error").value("Product with id=999 was not found"));
     }
