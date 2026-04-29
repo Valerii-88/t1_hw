@@ -4,6 +4,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.t1.feature6.users.UserRepository;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Service
@@ -31,9 +32,35 @@ public class ProductService {
                 .orElseThrow(() -> new ResourceNotFoundException("Product with id=" + productId + " was not found"));
     }
 
+    @Transactional
+    public Product debit(Long productId, BigDecimal amount) {
+        validateId(productId, "Product");
+        validateAmount(amount);
+
+        int updatedRows = productRepository.debitBalanceIfEnoughFunds(productId, amount);
+        if (updatedRows == 1) {
+            return getByProductId(productId);
+        }
+
+        if (productRepository.existsById(productId)) {
+            throw new InsufficientFundsException("Product with id=" + productId + " has insufficient funds");
+        }
+
+        throw new ResourceNotFoundException("Product with id=" + productId + " was not found");
+    }
+
     private void validateId(Long id, String label) {
         if (id == null || id <= 0) {
             throw new IllegalArgumentException(label + " id must be positive");
+        }
+    }
+
+    private void validateAmount(BigDecimal amount) {
+        if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new IllegalArgumentException("Amount must be positive");
+        }
+        if (amount.scale() > 2) {
+            throw new IllegalArgumentException("Amount must have at most 2 decimal places");
         }
     }
 }

@@ -21,4 +21,14 @@ public class ProductMapper {
                 .map(this::toResponse)
                 .toList();
     }
+
+    public ProductDebitResponse toDebitResponse(Product product) {
+        return new ProductDebitResponse(
+                product.getId(),
+                product.getAccountNumber(),
+                product.getBalance(),
+                product.getProductType(),
+                product.getUser().getId()
+        );
+    }
 }

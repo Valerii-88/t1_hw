@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import ru.t1.feature6.users.User;
@@ -14,6 +15,7 @@ import java.util.List;
 
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -56,5 +58,67 @@ class ProductControllerTest {
         mockMvc.perform(get("/api/v1/products/999"))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.error").value("Product with id=999 was not found"));
+    }
+
+    @Test
+    void debitsProductByHttp() throws Exception {
+        User user = new User(7L, "test_user_1");
+        Product product = new Product(101L, "40817810000000000001", new BigDecimal("15000.00"), ProductType.ACCOUNT, user);
+
+        when(productService.debit(101L, new BigDecimal("320.45"))).thenReturn(product);
+
+        mockMvc.perform(post("/api/v1/products/101/debit")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"amount":320.45}
+                                """))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(101))
+                .andExpect(jsonPath("$.accountNumber").value("40817810000000000001"))
+                .andExpect(jsonPath("$.balance").value(15000.00))
+                .andExpect(jsonPath("$.productType").value("ACCOUNT"))
+                .andExpect(jsonPath("$.userId").value(7));
+    }
+
+    @Test
+    void returnsUnprocessableEntityForInsufficientFunds() throws Exception {
+        when(productService.debit(101L, new BigDecimal("320.45")))
+                .thenThrow(new InsufficientFundsException("Product with id=101 has insufficient funds"));
+
+        mockMvc.perform(post("/api/v1/products/101/debit")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"amount":320.45}
+                                """))
+                .andExpect(status().isUnprocessableEntity())
+                .andExpect(jsonPath("$.error").value("Product with id=101 has insufficient funds"));
+    }
+
+    @Test
+    void returnsBadRequestForNonPositiveDebitAmount() throws Exception {
+        when(productService.debit(101L, BigDecimal.ZERO))
+                .thenThrow(new IllegalArgumentException("Amount must be positive"));
+
+        mockMvc.perform(post("/api/v1/products/101/debit")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"amount":0}
+                                """))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.error").value("Amount must be positive"));
+    }
+
+    @Test
+    void returnsBadRequestForOverPrecisionDebitAmount() throws Exception {
+        when(productService.debit(101L, new BigDecimal("0.001")))
+                .thenThrow(new IllegalArgumentException("Amount must have at most 2 decimal places"));
+
+        mockMvc.perform(post("/api/v1/products/101/debit")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"amount":0.001}
+                                """))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.error").value("Amount must have at most 2 decimal places"));
     }
 }

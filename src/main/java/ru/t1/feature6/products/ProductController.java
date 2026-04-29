@@ -2,6 +2,8 @@ package ru.t1.feature6.products;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -26,5 +28,10 @@ public class ProductController {
     @GetMapping("/products/{productId}")
     public ProductResponse getProductByProductId(@PathVariable Long productId) {
         return productMapper.toResponse(productService.getByProductId(productId));
+    }
+
+    @PostMapping("/products/{productId}/debit")
+    public ProductDebitResponse debitProduct(@PathVariable Long productId, @RequestBody ProductDebitRequest request) {
+        return productMapper.toDebitResponse(productService.debit(productId, request.amount()));
     }
 }

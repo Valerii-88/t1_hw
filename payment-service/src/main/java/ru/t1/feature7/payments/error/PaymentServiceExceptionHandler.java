@@ -1,0 +1,40 @@
+package ru.t1.feature7.payments.error;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+import java.util.Map;
+
+@RestControllerAdvice
+public class PaymentServiceExceptionHandler {
+    @ExceptionHandler(DownstreamProductServiceException.class)
+    public ResponseEntity<Map<String, String>> handleDownstreamProductServiceException(
+            DownstreamProductServiceException exception
+    ) {
+        return ResponseEntity.status(exception.getStatus())
+                .body(Map.of("error", exception.getMessage()));
+    }
+
+    @ExceptionHandler(DownstreamProductServiceUnavailableException.class)
+    public ResponseEntity<Map<String, String>> handleDownstreamProductServiceUnavailableException(
+            DownstreamProductServiceUnavailableException exception
+    ) {
+        return ResponseEntity.status(HttpStatus.BAD_GATEWAY)
+                .body(Map.of("error", exception.getMessage()));
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public Map<String, String> handleBadRequest(IllegalArgumentException exception) {
+        return Map.of("error", exception.getMessage());
+    }
+
+    @ExceptionHandler(ProductOwnershipException.class)
+    public ResponseEntity<Map<String, String>> handleProductOwnershipException(ProductOwnershipException exception) {
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(Map.of("error", exception.getMessage()));
+    }
+}

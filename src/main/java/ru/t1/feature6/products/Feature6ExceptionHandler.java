@@ -1,6 +1,7 @@
 package ru.t1.feature6.products;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -19,5 +20,11 @@ public class Feature6ExceptionHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public Map<String, String> handleBadRequest(IllegalArgumentException exception) {
         return Map.of("error", exception.getMessage());
+    }
+
+    @ExceptionHandler(InsufficientFundsException.class)
+    public ResponseEntity<Map<String, String>> handleInsufficientFunds(InsufficientFundsException exception) {
+        return ResponseEntity.unprocessableEntity()
+                .body(Map.of("error", exception.getMessage()));
     }
 }
